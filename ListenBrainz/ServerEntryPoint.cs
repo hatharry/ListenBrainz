@@ -11,7 +11,7 @@
     using MediaBrowser.Model.Logging;
     using MediaBrowser.Model.Serialization;
     using System.Linq;
-
+    using System;
 
     /// <summary>
     /// Class ServerEntryPoint
@@ -55,7 +55,7 @@
         /// Let ListenBrainz know when a track has finished.
         /// Playback stopped is run when a track is finished.
         /// </summary>
-        private void PlaybackStopped(object sender, PlaybackStopEventArgs e)
+        private async void PlaybackStopped(object sender, PlaybackStopEventArgs e)
         {
             //We only care about audio
             if (!(e.Item is Audio))
@@ -110,13 +110,20 @@
                 return;
             }
 
-            _apiClient.Scrobble(item, listenBrainzUser);
+            try
+            {
+                await _apiClient.Scrobble(item, listenBrainzUser).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                Plugin.Logger.ErrorException("Error scrobbling to ListenBrainz", ex);
+            }
         }
 
         /// <summary>
         /// Let ListenBrainz know when a user has started listening to a track
         /// </summary>
-        private void PlaybackStart(object sender, PlaybackProgressEventArgs e)
+        private async void PlaybackStart(object sender, PlaybackProgressEventArgs e)
         {
             //We only care about audio
             if (!(e.Item is Audio))
@@ -149,7 +156,15 @@
             }
 
             var item = e.Item as Audio;
-            _apiClient.NowPlaying(item, listenBrainzUser);
+
+            try
+            {
+                await _apiClient.NowPlaying(item, listenBrainzUser).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                Plugin.Logger.ErrorException("Error reporting playback start to ListenBrainz", ex);
+            }
         }
 
         private ListenBrainzUser GetUser(User user)

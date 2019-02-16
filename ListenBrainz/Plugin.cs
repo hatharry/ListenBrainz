@@ -38,7 +38,7 @@ namespace ListenBrainz
             };
         }
 
-        private Guid _id = new Guid("CCAB89B9-8EE2-4F43-9C2E-E66646C2FADE");
+        private Guid _id = new Guid("FC7FB5C1-3DAF-4E74-988E-1FF4A66D2651");
         public override Guid Id
         {
             get { return _id; }
