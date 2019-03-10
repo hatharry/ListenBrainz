@@ -110,6 +110,18 @@
                 return;
             }
 
+            if (string.IsNullOrWhiteSpace(item.Name))
+            {
+                Plugin.Logger.Info("No title present, aborting");
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(item.Artists.FirstOrDefault()))
+            {
+                Plugin.Logger.Info("No artist present, aborting");
+                return;
+            }
+
             try
             {
                 await _apiClient.Scrobble(item, listenBrainzUser).ConfigureAwait(false);
@@ -156,6 +168,18 @@
             }
 
             var item = e.Item as Audio;
+
+            if (string.IsNullOrWhiteSpace(item.Name))
+            {
+                Plugin.Logger.Info("No title present, aborting");
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(item.Artists.FirstOrDefault()))
+            {
+                Plugin.Logger.Info("No artist present, aborting");
+                return;
+            }
 
             try
             {
