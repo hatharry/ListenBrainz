@@ -116,7 +116,7 @@
                 return;
             }
 
-            if (string.IsNullOrWhiteSpace(item.Artists.FirstOrDefault()))
+            if (item.Artists.Length == 0)
             {
                 Plugin.Logger.Info("No artist present, aborting");
                 return;
@@ -175,7 +175,7 @@
                 return;
             }
 
-            if (string.IsNullOrWhiteSpace(item.Artists.FirstOrDefault()))
+            if (item.Artists.Length == 0)
             {
                 Plugin.Logger.Info("No artist present, aborting");
                 return;
