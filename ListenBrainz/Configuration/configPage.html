@@ -1,213 +1,28 @@
-﻿<!DOCTYPE html>
-<html>
+﻿<div is="emby-scroller" class="view flex flex-direction-column scrollFrameY flex-grow" data-horizontal="false" data-forcescrollbar="true" data-centerfocus="true" data-bindheader="true" data-controller="__plugin/listenbrainzjs" data-title="ListenBrainz">
+    <div class="scrollSlider flex-grow flex-direction-column padded-left padded-left-page padded-right padded-top-page padded-bottom-page">
 
-<head>
-    <title>ListenBrainz Scrobbler Configuration</title>
-</head>
-
-<body>
-    <div id="ListenBrainzScrobblerConfigurationPage" data-role="page" class="page type-interior pluginConfigurationPage"
-        data-require="emby-input,emby-button,emby-select,emby-checkbox">
-
-        <div data-role="content">
-            <div class="content-primary">
-                <form id="ListenBrainzScrobblerConfigurationForm">
-                    <div class="selectContainer">
-                        <select is="emby-select" id="user" name="user" label="Configure ListenBrainz for:"></select>
-                    </div>
-                    <div class="inputContainer">
-                        <input is="emby-input" id="username" name="username" type="text" label="Username:" />
-                    </div>
-                    <div class="inputContainer">
-                        <input is="emby-input" id="password" name="password" type="text" label="User token:" />
-                        <div class="fieldDescription">
-                            <a is="emby-linkbutton" class="button-link" target="_blank" href="https://listenbrainz.org/profile/">${ButtonRegister}</a>
-                        </div>
-                    </div>
-                    <div class="checkboxContainer">
-                        <label>
-                            <input is="emby-checkbox" type="checkbox" id="optionScrobble" name="optionScrobble" />
-                            <span>Enable Scrobbling for this user?</span>
-                        </label>
-                    </div>
-                    <div>
-                        <button is="emby-button" type="submit" class="raised button-submit block"><span>${ButtonSave}</span></button>
-                    </div>
-                </form>
+        <form class="auto-center">
+            <div class="selectContainer">
+                <select is="emby-select" class="user" name="user" label="Configure ListenBrainz for:"></select>
             </div>
-        </div>
-
-        <script type="text/javascript">
-
-            var ListenBrainzScrobblerConfigurationPage = {
-                _pluginUniqueId: "FC7FB5C1-3DAF-4E74-988E-1FF4A66D2651",
-                _users: [],
-                _config: [],
-
-                _currentUserId: '',
-                _currentUserConfig: null,
-
-                configDefaults: {
-                    Username: '',
-                    SessionKey: '',
-                    MediaBrowserUserId: '',
-                    Options: {
-                        Scrobble: false
-                    }
-                },
-
-                $el: null,
-
-                init: function ($ctx) {
-                    Dashboard.showLoadingMsg();
-
-                    this.$el = $ctx;
-
-                    this.$el.find('#ListenBrainzScrobblerConfigurationForm').on('submit', this, this.onSubmit);
-                    this.$el.find('#user').on('change', this, $.proxy(this.onUserChange, this));
-
-                    var loadConfig = this.loadConfiguration();
-                    var loadUsers = this.loadUsers().then($.proxy(this.buildUserList, this));
-
-                    //When we load everything, set the current user
-                    $.when(loadConfig, loadUsers).then($.proxy(function () {
-                        Dashboard.hideLoadingMsg();
-
-                        //Populate the inputs with the default selected user
-                        this.onUserChange();
-                    }, this));
-                },
-
-                loadConfiguration: function () {
-                    return ApiClient.getPluginConfiguration(this._pluginUniqueId).then($.proxy(function (config) {
-                        this._config = config;
-                    }, this));
-                },
-
-                loadUsers: function () {
-                    return ApiClient.getUsers().then($.proxy(function (users) {
-                        this._users = users;
-                    }, this));
-                },
-
-                saveConfiguration: function () {
-                    return ApiClient.updatePluginConfiguration(this._pluginUniqueId, this._config);
-                },
-
-                buildUserList: function () {
-                    var $selectEl = this.$el.find('#user');
-                    var html = '';
-
-                    $.each(this._users, function (i, user) {
-                        html += "<option value='" + user.Id + "'>" + user.Name + "</option>";
-                    });
-
-                    $selectEl
-                        .html(html);
-                },
-
-                populateInputs: function (userData) {
-                    var data = $.extend({}, this.configDefaults, userData);
-
-                    this.$el.find('#username').val(data.Username);
-                    this.$el.find('#password').val(data.SessionKey);
-                    this.$el.find('#optionScrobble').prop('checked', data.Options.Scrobble);
-
-                    //Dont forget to call checkboxradio('refresh') otherwise the UI wont update
-                },
-
-                save: function (username, password) {
-                    var userConfig = this.getCurrentSelectedUser();
-
-                    //If the conig for the user doesnt exist, create one
-                    if (!userConfig) {
-                        userConfig = $.extend({}, this.configDefaults, { MediaBrowserUserId: this.getCurrentSelectedUserId() });
-
-                        this._config.ListenBrainzUsers.push(userConfig);
-                    }
-
-                    userConfig.Username = username;
-                    userConfig.SessionKey = password;
-                    userConfig.Options = this.getUIOptionsValues();
-
-
-                    Dashboard.showLoadingMsg();
-
-                    //Save
-                    this.doSave();
-
-                    return;
-                },
-
-                doSave: function () {
-                    return this.saveConfiguration().then($.proxy(function (result) {
-                        Dashboard.processPluginConfigurationUpdateResult(result);
-
-                        this.onUserChange();
-                    }, this));
-                },
-
-                getCurrentSelectedUserId: function () {
-                    return this.$el.find('#user').val();
-                },
-
-                getCurrentSelectedUser: function () {
-                    //Get the current user
-                    var currentUserId = this.getCurrentSelectedUserId();
-
-                    var currentUser = this._config.ListenBrainzUsers.filter(function (user) {
-                        return user.MediaBrowserUserId == currentUserId;
-                    })[0];
-
-                    return currentUser;
-                },
-
-                getSelectedMBUser: function () {
-                    //Get the current user
-                    var currentUserId = this.getCurrentSelectedUserId();
-
-                    var currentUser = this._users.filter(function (user) {
-                        return user.Id == currentUserId;
-                    })[0];
-
-                    return currentUser;
-                },
-
-                //Will return an options object with the current UI settings
-                getUIOptionsValues: function () {
-                    var options = $.extend({}, this.configDefaults.Options);
-
-                    options.Scrobble = this.$el.find('#optionScrobble')[0].checked;
-
-                    return options;
-                },
-
-                onUserChange: function () {
-                    var currentUser = this.getCurrentSelectedUser();
-
-                    this.populateInputs(currentUser);
-                },
-
-                onSubmit: function (e) {
-                    e.preventDefault();
-
-                    var self = e.data;
-
-                    var username = $(this).find("#username").val();
-                    var password = $(this).find("#password").val();
-
-                    //Load the config again in case another user has updated their ListenBrainz info
-                    self.loadConfiguration().then(function () {
-                        self.save(username, password);
-                    });
-                }
-            };
-
-            $('#ListenBrainzScrobblerConfigurationPage').on('pageshow', function () {
-                ListenBrainzScrobblerConfigurationPage.init($(this));
-            });
-        </script>
+            <div class="inputContainer">
+                <input is="emby-input" class="username" name="username" type="text" label="Username:" />
+            </div>
+            <div class="inputContainer">
+                <input is="emby-input" class="password" name="password" type="text" label="User token:" />
+                <div class="fieldDescription">
+                    <a is="emby-linkbutton" class="button-link" target="_blank" href="https://listenbrainz.org">${Register}</a>
+                </div>
+            </div>
+            <div class="checkboxContainer">
+                <label>
+                    <input is="emby-checkbox" type="checkbox" class="optionScrobble" name="optionScrobble" />
+                    <span>Enable Scrobbling for this user?</span>
+                </label>
+            </div>
+            <div>
+                <button is="emby-button" type="submit" class="raised button-submit block"><span>${Save}</span></button>
+            </div>
+        </form>
     </div>
-</body>
-
-</html>
+</div>
