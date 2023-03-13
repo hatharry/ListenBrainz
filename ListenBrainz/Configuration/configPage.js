@@ -20,11 +20,6 @@
         return false;
     }
 
-    function getConfig() {
-
-        return ApiClient.getNamedConfiguration("opensubtitles");
-    }
-
     function View(view, params) {
         BaseView.apply(this, arguments);
 
