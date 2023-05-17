@@ -12,6 +12,7 @@
     using MediaBrowser.Model.Serialization;
     using System.Linq;
     using System;
+    using MediaBrowser.Common.Configuration;
 
     /// <summary>
     /// Class ServerEntryPoint
@@ -93,20 +94,17 @@
             var listenBrainzUser = GetUser(user);
             if (listenBrainzUser == null)
             {
-                Plugin.Logger.Debug("Could not find ListenBrainz user");
                 return;
             }
 
             //User doesn't want to scrobble
-            if (!listenBrainzUser.Options.Scrobble)
+            if (!listenBrainzUser.Scrobble)
             {
-                Plugin.Logger.Debug("{0} ({1}) does not want to scrobble", user.Name, listenBrainzUser.Username);
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(listenBrainzUser.SessionKey))
             {
-                Plugin.Logger.Info("No session key present, aborting");
                 return;
             }
 
@@ -150,20 +148,17 @@
             var listenBrainzUser = GetUser(user);
             if (listenBrainzUser == null)
             {
-                Plugin.Logger.Debug("Could not find ListenBrainz user");
                 return;
             }
 
             //User doesn't want to scrobble
-            if (!listenBrainzUser.Options.Scrobble)
+            if (!listenBrainzUser.Scrobble)
             {
-                Plugin.Logger.Debug("{0} ({1}) does not want to scrobble", user.Name, listenBrainzUser.Username);
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(listenBrainzUser.SessionKey))
             {
-                Plugin.Logger.Info("No session key present, aborting");
                 return;
             }
 
@@ -193,13 +188,7 @@
 
         private ListenBrainzUser GetUser(User user)
         {
-            if (user == null)
-                return null;
-
-            if (Plugin.Instance.PluginConfiguration.ListenBrainzUsers == null)
-                return null;
-
-            return Plugin.Instance.PluginConfiguration.ListenBrainzUsers.FirstOrDefault(u => u.MediaBrowserUserId.Equals(user.Id));
+            return (ListenBrainzUser)user.GetTypedSetting(ConfigurationFactory.ConfigKey);
         }
 
         /// <summary>

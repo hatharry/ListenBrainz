@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using ListenBrainz.Configuration;
 using MediaBrowser.Common.Configuration;
 using MediaBrowser.Common.Plugins;
+using MediaBrowser.Controller.Net;
 using MediaBrowser.Model.Drawing;
 using MediaBrowser.Model.Logging;
 using MediaBrowser.Model.Plugins;
@@ -11,17 +11,11 @@ using MediaBrowser.Model.Serialization;
 
 namespace ListenBrainz
 {
-    public class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages, IHasThumbImage
+    public class Plugin : BasePlugin, IHasWebPages, IHasThumbImage
     {
         public static ILogger Logger { get; set; }
 
-        public PluginConfiguration PluginConfiguration
-        {
-            get { return Configuration; }
-        }
-
-        public Plugin(IApplicationPaths applicationPaths, IXmlSerializer xmlSerializer)
-            : base(applicationPaths, xmlSerializer)
+        public Plugin()
         {
             Instance = this;
         }
@@ -33,7 +27,10 @@ namespace ListenBrainz
                 new PluginPageInfo
                 {
                     Name = "listenbrainz",
-                    EmbeddedResourcePath = GetType().Namespace + ".Configuration.configPage.html"
+                    EmbeddedResourcePath = GetType().Namespace + ".Configuration.configPage.html",
+                    EnableInUserMenu = true,
+                    MenuIcon = "library_music",
+                    FeatureId = Feature.StaticId
                 },
                 new PluginPageInfo
                 {
@@ -49,13 +46,15 @@ namespace ListenBrainz
             get { return _id; }
         }
 
+        public static string StaticName = "ListenBrainz";
+
         /// <summary>
         /// Gets the name of the plugin
         /// </summary>
         /// <value>The name.</value>
         public override string Name
         {
-            get { return "ListenBrainz"; }
+            get { return StaticName; }
         }
 
         /// <summary>
