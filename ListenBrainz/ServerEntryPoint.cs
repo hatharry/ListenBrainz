@@ -85,6 +85,18 @@
                 return;
             }
 
+            if (string.IsNullOrWhiteSpace(item.Name))
+            {
+                Plugin.Logger.Info("No title present, aborting");
+                return;
+            }
+
+            if (item.Artists.Length == 0)
+            {
+                Plugin.Logger.Info("No artist present, aborting");
+                return;
+            }
+
             var user = e.Users.FirstOrDefault();
             if (user == null)
             {
@@ -108,15 +120,8 @@
                 return;
             }
 
-            if (string.IsNullOrWhiteSpace(item.Name))
+            if (!user.IsGrantedAccessToFeature(Feature.StaticId))
             {
-                Plugin.Logger.Info("No title present, aborting");
-                return;
-            }
-
-            if (item.Artists.Length == 0)
-            {
-                Plugin.Logger.Info("No artist present, aborting");
                 return;
             }
 
@@ -139,6 +144,20 @@
             if (!(e.Item is Audio))
                 return;
 
+            var item = e.Item as Audio;
+
+            if (string.IsNullOrWhiteSpace(item.Name))
+            {
+                Plugin.Logger.Info("No title present, aborting");
+                return;
+            }
+
+            if (item.Artists.Length == 0)
+            {
+                Plugin.Logger.Info("No artist present, aborting");
+                return;
+            }
+
             var user = e.Users.FirstOrDefault();
             if (user == null)
             {
@@ -162,17 +181,8 @@
                 return;
             }
 
-            var item = e.Item as Audio;
-
-            if (string.IsNullOrWhiteSpace(item.Name))
+            if (!user.IsGrantedAccessToFeature(Feature.StaticId))
             {
-                Plugin.Logger.Info("No title present, aborting");
-                return;
-            }
-
-            if (item.Artists.Length == 0)
-            {
-                Plugin.Logger.Info("No artist present, aborting");
                 return;
             }
 
