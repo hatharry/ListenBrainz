@@ -22,7 +22,7 @@
         {
             return new[]
             {
-                new TraktConfigStore
+                new ConfigStore
                 {
                      ConfigurationType = typeof(ListenBrainzUser),
                      Key = ConfigKey
@@ -33,7 +33,7 @@
         public static string ConfigKey = Feature.StaticId;
     }
 
-    public class TraktConfigStore : ConfigurationStore, IValidatingConfiguration
+    public class ConfigStore : ConfigurationStore, IValidatingConfiguration
     {
         public void Validate(object oldConfig, object newConfig)
         {

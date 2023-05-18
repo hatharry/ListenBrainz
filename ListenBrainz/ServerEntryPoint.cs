@@ -87,51 +87,46 @@
 
             if (string.IsNullOrWhiteSpace(item.Name))
             {
-                Plugin.Logger.Info("No title present, aborting");
                 return;
             }
 
             if (item.Artists.Length == 0)
             {
-                Plugin.Logger.Info("No artist present, aborting");
                 return;
             }
 
-            var user = e.Users.FirstOrDefault();
-            if (user == null)
+            foreach (var user in e.Users.ToArray())
             {
-                return;
-            }
+                var listenBrainzUser = GetUser(user);
+                if (listenBrainzUser == null)
+                {
+                    continue;
+                }
 
-            var listenBrainzUser = GetUser(user);
-            if (listenBrainzUser == null)
-            {
-                return;
-            }
+                //User doesn't want to scrobble
+                if (!listenBrainzUser.Scrobble)
+                {
+                    continue;
+                }
 
-            //User doesn't want to scrobble
-            if (!listenBrainzUser.Scrobble)
-            {
-                return;
-            }
+                if (string.IsNullOrWhiteSpace(listenBrainzUser.SessionKey))
+                {
+                    continue;
+                }
 
-            if (string.IsNullOrWhiteSpace(listenBrainzUser.SessionKey))
-            {
-                return;
-            }
+                if (!user.IsGrantedAccessToFeature(Feature.StaticId))
+                {
+                    continue;
+                }
 
-            if (!user.IsGrantedAccessToFeature(Feature.StaticId))
-            {
-                return;
-            }
-
-            try
-            {
-                await _apiClient.Scrobble(item, listenBrainzUser).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                Plugin.Logger.ErrorException("Error scrobbling to ListenBrainz", ex);
+                try
+                {
+                    await _apiClient.Scrobble(item, listenBrainzUser).ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    Plugin.Logger.ErrorException("Error scrobbling to ListenBrainz", ex);
+                }
             }
         }
 
@@ -148,51 +143,46 @@
 
             if (string.IsNullOrWhiteSpace(item.Name))
             {
-                Plugin.Logger.Info("No title present, aborting");
                 return;
             }
 
             if (item.Artists.Length == 0)
             {
-                Plugin.Logger.Info("No artist present, aborting");
                 return;
             }
 
-            var user = e.Users.FirstOrDefault();
-            if (user == null)
+            foreach (var user in e.Users.ToArray())
             {
-                return;
-            }
+                var listenBrainzUser = GetUser(user);
+                if (listenBrainzUser == null)
+                {
+                    continue;
+                }
 
-            var listenBrainzUser = GetUser(user);
-            if (listenBrainzUser == null)
-            {
-                return;
-            }
+                //User doesn't want to scrobble
+                if (!listenBrainzUser.Scrobble)
+                {
+                    continue;
+                }
 
-            //User doesn't want to scrobble
-            if (!listenBrainzUser.Scrobble)
-            {
-                return;
-            }
+                if (string.IsNullOrWhiteSpace(listenBrainzUser.SessionKey))
+                {
+                    continue;
+                }
 
-            if (string.IsNullOrWhiteSpace(listenBrainzUser.SessionKey))
-            {
-                return;
-            }
+                if (!user.IsGrantedAccessToFeature(Feature.StaticId))
+                {
+                    continue;
+                }
 
-            if (!user.IsGrantedAccessToFeature(Feature.StaticId))
-            {
-                return;
-            }
-
-            try
-            {
-                await _apiClient.NowPlaying(item, listenBrainzUser).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                Plugin.Logger.ErrorException("Error reporting playback start to ListenBrainz", ex);
+                try
+                {
+                    await _apiClient.NowPlaying(item, listenBrainzUser).ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    Plugin.Logger.ErrorException("Error reporting playback start to ListenBrainz", ex);
+                }
             }
         }
 
