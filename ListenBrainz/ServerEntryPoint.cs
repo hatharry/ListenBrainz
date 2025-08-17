@@ -13,6 +13,7 @@
     using System.Linq;
     using System;
     using MediaBrowser.Common.Configuration;
+    using MediaBrowser.Model.Entities;
 
     /// <summary>
     /// Class ServerEntryPoint
@@ -39,7 +40,20 @@
 
             _apiClient = new ListenBrainzApiClient(httpClient, jsonSerializer);
 
+            _userDataManager.UserDataSaved += _userDataManager_UserDataSaved;
+
             Instance = this;
+        }
+
+        private void _userDataManager_UserDataSaved(object sender, UserDataSaveEventArgs e)
+        {
+            switch (e.SaveReason)
+            {
+                case UserDataSaveReason.UpdateUserRating:
+                    break;
+                default:
+                    return;
+            }
         }
 
         /// <summary>
