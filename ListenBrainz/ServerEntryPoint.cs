@@ -45,11 +45,16 @@
             Instance = this;
         }
 
-        private void _userDataManager_UserDataSaved(object sender, UserDataSaveEventArgs e)
+        private async void _userDataManager_UserDataSaved(object sender, UserDataSaveEventArgs e)
         {
+            if (!(e.Item is Audio))
+                return;
+
             switch (e.SaveReason)
             {
                 case UserDataSaveReason.UpdateUserRating:
+                    var item = e.Item as Audio;
+                    await _apiClient.Feedback(item, e.User).ConfigureAwait(false);
                     break;
                 default:
                     return;
@@ -200,7 +205,7 @@
             }
         }
 
-        private ListenBrainzUser GetUser(User user)
+        public ListenBrainzUser GetUser(User user)
         {
             return (ListenBrainzUser)user.GetTypedSetting(ConfigurationFactory.ConfigKey);
         }
