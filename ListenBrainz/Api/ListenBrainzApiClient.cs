@@ -41,15 +41,16 @@
         {
             var payload = BuildPayload("playing_now", item);
             var options = BuildRequest(user, payload);
-            var response = await _httpClient.Post(options).ConfigureAwait(false);
-
-            if (response.StatusCode == HttpStatusCode.OK)
+            using (var response = await _httpClient.Post(options).ConfigureAwait(false))
             {
-                Plugin.Logger.Info("{0} is now playing '{1}' - {2} - {3}", user.Username, item.Name, item.Album, item.Artists.FirstOrDefault());
-                return;
-            }
+                if (response.StatusCode == HttpStatusCode.OK)
+                {
+                    Plugin.Logger.Info("{0} is now playing '{1}' - {2} - {3}", user.Username, item.Name, item.Album, item.Artists.FirstOrDefault());
+                    return;
+                }
 
-            Plugin.Logger.Debug("Failed to send now playing for track: {0}", item.Name);
+                Plugin.Logger.Debug("Failed to send now playing for track: {0}", item.Name);
+            }
         }
 
         private HttpRequestOptions BuildRequest(ListenBrainzUser user, char[] payload)
