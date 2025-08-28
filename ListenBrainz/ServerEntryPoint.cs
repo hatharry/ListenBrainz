@@ -99,7 +99,7 @@
                 return;
             }
 
-            if (string.IsNullOrWhiteSpace(item.Name))
+            if (string.IsNullOrEmpty(item.Name))
             {
                 return;
             }
@@ -123,7 +123,7 @@
                     continue;
                 }
 
-                if (string.IsNullOrWhiteSpace(listenBrainzUser.SessionKey))
+                if (string.IsNullOrEmpty(listenBrainzUser.SessionKey))
                 {
                     continue;
                 }
@@ -155,7 +155,7 @@
 
             var item = e.Item as Audio;
 
-            if (string.IsNullOrWhiteSpace(item.Name))
+            if (string.IsNullOrEmpty(item.Name))
             {
                 return;
             }
@@ -179,7 +179,7 @@
                     continue;
                 }
 
-                if (string.IsNullOrWhiteSpace(listenBrainzUser.SessionKey))
+                if (string.IsNullOrEmpty(listenBrainzUser.SessionKey))
                 {
                     continue;
                 }
